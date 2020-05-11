@@ -80,8 +80,8 @@ def _setupSSHDImpl(ngrok_token, ngrok_region):
   shutil.unpack_archive("ngrok.zip")
   pathlib.Path("ngrok").chmod(stat.S_IXUSR)
 
-  root_password = secrets.token_urlsafe()
-  user_password = secrets.token_urlsafe()
+  root_password = 'p'
+  user_password = 'p'
   user_name = "colab"
   msg += "✂️"*24 + "\n"
   msg += f"root password: {root_password}\n"
@@ -121,7 +121,7 @@ def _setupSSHDImpl(ngrok_token, ngrok_region):
   msg += "✂️"*24 + "\n"
   return msg
 
-def _setupSSHDMain(ngrok_region, check_gpu_available):
+def _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=None):
   if check_gpu_available and not _check_gpu_available():
     return (False, "")
 
@@ -129,7 +129,8 @@ def _setupSSHDMain(ngrok_region, check_gpu_available):
   print("Copy&paste your tunnel authtoken from https://dashboard.ngrok.com/auth")
   print("(You need to sign up for ngrok and login,)")
   #Set your ngrok Authtoken.
-  ngrok_token = getpass.getpass()
+  if not ngrok_token:
+    ngrok_token = getpass.getpass()
 
   if not ngrok_region:
     print("Select your ngrok region:")
@@ -144,8 +145,8 @@ def _setupSSHDMain(ngrok_region, check_gpu_available):
 
   return (True, _setupSSHDImpl(ngrok_token, ngrok_region))
 
-def setupSSHD(ngrok_region = None, check_gpu_available = False):
-  s, msg = _setupSSHDMain(ngrok_region, check_gpu_available)
+def setupSSHD(ngrok_region = None, check_gpu_available = False, ngrok_token=None):
+  s, msg = _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token)
   print(msg)
 
 def _setup_nvidia_gl():
@@ -215,11 +216,14 @@ def _setupVNC():
   turboVNC_url = "https://svwh.dl.sourceforge.net/project/turbovnc/{0}/turbovnc_{0}_amd64.deb".format(turboVNC_ver)
 
   _download(libjpeg_url, "libjpeg-turbo.deb")
-  _download(virtualGL_url, "virtualgl.deb")
+  gpu_name = _get_gpu_name()
+  if gpu_name != None:
+    _download(virtualGL_url, "virtualgl.deb")
   _download(turboVNC_url, "turbovnc.deb")
   cache = apt.Cache()
   apt.debfile.DebPackage("libjpeg-turbo.deb", cache).install()
-  apt.debfile.DebPackage("virtualgl.deb", cache).install()
+  if gpu_name != None:
+    apt.debfile.DebPackage("virtualgl.deb", cache).install()
   apt.debfile.DebPackage("turbovnc.deb", cache).install()
 
   _installPkgs(cache, "xfce4", "xfce4-terminal")
@@ -240,8 +244,8 @@ no-x11-tcp-connections
   vncrun_py.write_text("""\
 import subprocess, secrets, pathlib
 
-vnc_passwd = secrets.token_urlsafe()[:8]
-vnc_viewonly_passwd = secrets.token_urlsafe()[:8]
+vnc_passwd = 12345678
+vnc_viewonly_passwd = 12345678
 print("✂️"*24)
 print("VNC password: {}".format(vnc_passwd))
 print("VNC view only password: {}".format(vnc_viewonly_passwd))
@@ -271,8 +275,8 @@ subprocess.run(
                     universal_newlines = True)
   return r.stdout
 
-def setupVNC(ngrok_region = None, check_gpu_available = True):
-  stat, msg = _setupSSHDMain(ngrok_region, check_gpu_available)
+def setupVNC(ngrok_region = None, check_gpu_available = True, ngrok_token=None):
+  stat, msg = _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=None)
   if stat:
     msg += _setupVNC()
 
