@@ -121,7 +121,7 @@ def _setupSSHDImpl(ngrok_token, ngrok_region):
   msg += "✂️"*24 + "\n"
   return msg
 
-def _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=ngrok_token):
+def _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=None):
   if check_gpu_available and not _check_gpu_available():
     return (False, "")
 
