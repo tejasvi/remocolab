@@ -121,7 +121,7 @@ def _setupSSHDImpl(ngrok_token, ngrok_region):
   msg += "✂️"*24 + "\n"
   return msg
 
-def _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=None):
+def _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=ngrok_token):
   if check_gpu_available and not _check_gpu_available():
     return (False, "")
 
@@ -276,7 +276,7 @@ subprocess.run(
   return r.stdout
 
 def setupVNC(ngrok_region = None, check_gpu_available = True, ngrok_token=None):
-  stat, msg = _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=None)
+  stat, msg = _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=ngrok_token)
   if stat:
     msg += _setupVNC()
 
