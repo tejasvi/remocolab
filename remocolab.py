@@ -278,9 +278,8 @@ subprocess.run(
 def setupVNC(ngrok_region = None, check_gpu_available = True, ngrok_token=None, ngrok=True):
   if ngrok:
       stat, msg = _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=ngrok_token)
+      msg += _setupVNC()
   else:
-      stat, msg = True, ''
-  if stat:
-    msg += _setupVNC()
+      msg = _setupVNC()
 
   print(msg)
