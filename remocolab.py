@@ -279,7 +279,7 @@ def setupVNC(ngrok_region = None, check_gpu_available = True, ngrok_token=None, 
   if ngrok:
       stat, msg = _setupSSHDMain(ngrok_region, check_gpu_available, ngrok_token=ngrok_token)
   else:
-      stat = True
+      stat, msg = True, ''
   if stat:
     msg += _setupVNC()
 
